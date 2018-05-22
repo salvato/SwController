@@ -6,6 +6,7 @@
 
 #define GPIO_IN 22
 
+
 void
 logMessage(QFile *logFile, QString sFunctionName, QString sMessage) {
     Q_UNUSED(sFunctionName)
@@ -32,13 +33,13 @@ logMessage(QFile *logFile, QString sFunctionName, QString sMessage) {
 }
 
 
-CBFunc_t
-gpioCallback(int pi, unsigned int user_gpio, unsigned int level, uint32_t tick) {
+CBFuncEx_t
+gpioCallback(int pi, unsigned int user_gpio, unsigned int level, uint32_t tick, void* userdata) {
     Q_UNUSED(pi)
     Q_UNUSED(user_gpio)
     Q_UNUSED(level)
     Q_UNUSED(tick)
-    qDebug() << QTime::currentTime();
+    ((MainWindow*)userdata)->logTime(QTime::currentTime());
     return 0;
 }
 
@@ -74,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
                    QString("Non riesco ad inizializzare il pull-up in GPIO_IN."));
         return;
     }
-    callBackId = callback(gpioHostHandle, GPIO_IN, RISING_EDGE, (CBFunc_t)gpioCallback);
+    callBackId = callback_ex(gpioHostHandle, GPIO_IN, RISING_EDGE, (CBFuncEx_t)gpioCallback, this);
     if(callBackId == pigif_bad_malloc) {
         logMessage(logFile,
                    sFunctionName,
@@ -105,4 +106,10 @@ MainWindow::~MainWindow() {
         pigpio_stop(gpioHostHandle);
     }
     delete ui;
+}
+
+
+void
+MainWindow::logTime(QTime eventTime) {
+    qDebug() << eventTime;
 }

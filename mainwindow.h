@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QFile>
+#include <QTime>
+
 #include "pigpiod_if2.h"// http://abyz.me.uk/rpi/pigpio/pdif2.html
 
 namespace Ui {
@@ -16,6 +18,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void logTime(QTime eventTime);
 
 protected:
     int gpioHostHandle;
