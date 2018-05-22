@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <QDebug>
 
+#define GPIO_IN 22
 
 void
 logMessage(QFile *logFile, QString sFunctionName, QString sMessage) {
@@ -37,7 +38,7 @@ gpioCallback(int pi, unsigned int user_gpio, unsigned int level, uint32_t tick) 
     Q_UNUSED(user_gpio)
     Q_UNUSED(level)
     Q_UNUSED(tick)
-    qDebug() << "pos=";
+    qDebug() << QTime::currentTime();
     return 0;
 }
 
@@ -61,19 +62,19 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // All GPIOs are identified by their Broadcom number.
-    if(set_mode(gpioHostHandle, 23, PI_INPUT)) {// Set the GPIO23 as Input.
+    if(set_mode(gpioHostHandle, GPIO_IN, PI_INPUT)) {// Set the GPIO_IN as Input.
         logMessage(logFile,
                    sFunctionName,
-                   QString("Non riesco ad inizializzare GPIO23."));
+                   QString("Non riesco ad inizializzare GPIO_IN."));
         return;
     }
-    if(set_pull_up_down(gpioHostHandle, 23, PI_PUD_UP)) {// Set the pull-up to GPIO23.
+    if(set_pull_up_down(gpioHostHandle, GPIO_IN, PI_PUD_DOWN)) {// Set the pull-up to GPIO_IN.
         logMessage(logFile,
                    sFunctionName,
-                   QString("Non riesco ad inizializzare il pull-up in GPIO23."));
+                   QString("Non riesco ad inizializzare il pull-up in GPIO_IN."));
         return;
     }
-    callBackId = callback(gpioHostHandle, 23, FALLING_EDGE, (CBFunc_t)gpioCallback);
+    callBackId = callback(gpioHostHandle, GPIO_IN, RISING_EDGE, (CBFunc_t)gpioCallback);
     if(callBackId == pigif_bad_malloc) {
         logMessage(logFile,
                    sFunctionName,
